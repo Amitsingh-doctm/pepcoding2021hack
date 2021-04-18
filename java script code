@@ -1,0 +1,107 @@
+let puppeteer = require("puppeteer");
+let fs = require("fs");
+
+(async function () {
+    try {
+        let browserInstance = await puppeteer.launch({
+            headless: false,
+            defaultViewport: null,
+            args: ["--start-maximized"]
+        });
+        let oyo = await getListingFromoyo("https://www.oyorooms.com/",browserInstance);
+        console.log(oyo);
+    
+        let travl = await getListingFromTrval("https://www.trivago.in/",browserInstance);
+       // console.table(oyo)
+        console.table(travl)
+    } catch (err) {
+        console.log(err);
+    }
+})();
+
+async function getListingFromoyo(link,browserInstance)
+{
+    let page = await browserInstance.newPage();
+   // await Page.goto(link);
+    await page.goto(link,{ waitUntil:"networkidle2"});
+ await page.waitForSelector('#autoComplete__home',{visible :true});
+ await page.type('#autoComplete__home',"mathura",{dealy:300});
+ await page.waitForTimeout(3000);
+ await page.keyboard.press('Enter');
+ await page.keyboard.press('Enter');
+ await page.waitForSelector('.listingHotelDescription__hotelName.d-textEllipsis',{visible :true});
+ function amiot(slecter1,slecter2,slector3,slector4) 
+ {
+let sd=document.querySelectorAll(slecter1);
+let se= document.querySelectorAll(slecter2);
+let de= document.querySelectorAll(slector3);
+let de1= document.querySelectorAll(slector4);
+let arr=[];
+for(let i=0;i<sd.length;i++)
+{
+ let s=sd[i].innerText.trim();
+ let n=se[i].innerText.trim();
+let y= de[i].innerText.trim();
+ let r= de1[i].innerText.trim();
+ arr.push({
+   name:s,
+  rating:n,
+distance:y,
+   price:r,
+})
+}
+return arr;
+}
+let s= await page.evaluate(amiot,'.listingHotelDescription__hotelName.d-textEllipsis','.is-fontBold.hotelRating__rating','span[itemprop="streetAddress"]','.listingPrice__finalPrice');
+return s;
+}
+
+async function getListingFromTrval(link, browserInstance)
+{
+    let page = await browserInstance.newPage();
+    await page.goto(link,{ waitUntil:"networkidle2"});
+    await page.waitForSelector('input[aria-owns="ssg-suggestions"]',{visible :true});
+    await page.type('input[aria-owns="ssg-suggestions"]',"mathura",{dealy:300});
+    await page.waitForTimeout(3000);
+    await page.keyboard.press('Enter');
+    await page.waitForSelector('.btn.btn--primary.btn--regular.search-button.js-search-button',{visible :true});
+    await page.click(".btn.btn--primary.btn--regular.search-button.js-search-button");
+    await page.waitForSelector('span[data-qa="item-name"]',{visible :true});
+    console.log("4");
+       function amiot(slecter1,slecter2,slector3,slector4) 
+       {
+   let sd=document.querySelectorAll(slecter1);
+   let se= document.querySelectorAll(slecter2);
+   let de= document.querySelectorAll(slector3);
+   let de1= document.querySelectorAll(slector4);
+   let arr=[];
+   for(let i=0;i<sd.length;i++)
+   {
+       let s= sd[i].innerText;
+       let n= se[i].innerText;
+       let y= de[i].innerText;
+       let r= de1[i].innerText;
+       arr.push({
+         name:s,
+         rating:n,
+         price :y,
+         distence:r})
+   }
+     return arr;
+   }
+   let s= await page.evaluate(amiot,'span[data-qa="item-name"]','span[itemprop="ratingValue"]','strong[data-qa="recommended-price"]','.details-paragraph.details-paragraph--location.location-details');
+     return s;
+   }
+
+
+
+
+
+
+
+
+
+
+
+
+
